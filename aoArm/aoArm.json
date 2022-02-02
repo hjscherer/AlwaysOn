@@ -1,0 +1,128 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "principalId": {
+            "type": "array",
+            "defaultValue": []
+        },
+        "adoPAT": {
+            "type": "securestring",
+            "defaultValue": ""
+        },
+        "appId": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "principalSecret": {
+            "type": "securestring",
+            "defaultValue": ""
+        },
+        "adoOrgName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "adoProjectName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "ghOrgName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "ghRepoName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "ghPAToken": {
+            "type": "securestring",
+            "defaultValue": ""
+        },
+        "e2ePrefix": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "e2eSubscriptionId": {
+            "type": "string",
+            "defaultValue": ""
+        },
+
+        "e2eLocations":{
+            "type": "array",
+            "defaultValue": []
+        }
+    },
+    "variables": {
+        "ownerRoleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2021-04-01",
+            "name": "ao-pipeline-rg",
+            "location": "northeurope",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "new-name",
+            "resourceGroup": "ao-pipeline-rg",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups/', 'ao-pipeline-rg')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "https://raw.githubusercontent.com/hjscherer/AO/dev/aoArm/aoCICDArm.json"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[parameters('principalId')]"
+                    },
+                    "appId": {
+                        "value": "[parameters('appId')]"
+                    },
+                    "principalSecret": {
+                        "value": "[parameters('principalSecret')]"
+                    },
+                    "adoPAT": {
+                        "value": "[parameters('adoPAT')]"
+                    },
+                    "adoOrgName": {
+                        "value": "[parameters('adoOrgName')]"
+                    },
+                    "adoProjectName": {
+                        "value": "[parameters('adoProjectName')]"
+                    },
+                    "ghOrgName": {
+                        "value": "[parameters('ghOrgName')]"
+                    },
+                    "ghRepoName": {
+                        "value": "[parameters('ghRepoName')]"
+                    },
+                    "ghPAToken": {
+                        "value": "[parameters('ghPAToken')]"
+                    },
+                    "e2eprefix": {
+                        "value": "[parameters('e2ePrefix')]"
+                    },
+                    "e2esubscriptionId": {
+                        "value": "[parameters('e2eSubscriptionId')]"
+                    },
+                    "e2eLocations": {
+                        "value": "[parameters('e2eLocations')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "deployment": {
+            "type": "string",
+            "value": "[concat(deployment().name, ' has successfully deployed. Welcome to AlwaysOn!')]"
+        }
+    }
+}

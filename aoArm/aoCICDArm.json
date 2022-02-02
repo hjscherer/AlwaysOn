@@ -1,0 +1,86 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "principalId": {
+            "type": "array"
+        },
+        "appId": {
+            "type": "string"
+        },
+        "principalSecret": {
+            "type": "securestring"
+        },
+        "adoPAT": {
+            "type": "securestring"
+        },
+        "adoOrgName": {
+            "type": "string"
+        },
+        "adoProjectName": {
+            "type": "string"
+        },
+        "ghOrgName": {
+            "type": "string"
+        },
+        "ghRepoName": {
+            "type": "string"
+        },
+        "ghPAToken": {
+            "type": "securestring"
+        },
+        "e2ePrefix": {
+            "type": "string"
+        },
+        "e2eSubscriptionId": {
+            "type": "string"
+        },
+        "e2eLocations": {
+            "type": "array"
+        }
+
+    },
+    "variables": {
+        "userManagedIdentityName": "[concat('test', '-umi')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2020-10-01",
+            "name": "[concat('ao-pipeline', '-ado')]",
+            "location": "northeurope",
+            "kind": "AzurePowerShell",
+            "dependsOn": [],
+            "properties": {
+                "primaryScriptUri": "https://raw.githubusercontent.com/hjscherer/AO/dev/aoArm/deploymentScript/AzDevOps-Deploy.ps1",
+                "arguments": "[concat('-AzureTenantId', ' ', '72f988bf-86f1-41af-91ab-2d7cd011db47', ' ',
+                                      '-AzureSubscriptionId', ' ', subscription().subscriptionId, ' ',
+                                      '-AzDevOpsOrgName', ' ', parameters('adoOrgName'), ' ',
+                                      '-AzDevOpsProjectName', ' ', parameters('adoProjectName'), ' ',
+                                      '-AOE2EPrefix' , ' ', parameters('e2ePrefix'), ' ',
+                                      '-ServicePrincipalName', ' ', 'todelete-ao', ' ',
+                                      '-GithubPAT', ' ', parameters('ghPAToken'), ' ',
+                                      '-GithubAccountName', ' ', parameters('ghOrgName'), ' ',
+                                      '-GithubRepoName', ' ', 'dummy', ' ',
+                                      '-GithubBranchName', ' ', 'new-test', ' ',
+                                      '-SkipFirstPipelineRun', ' ', '$True' , ' ',
+                                      '-SmokeTestUserName', ' ', '\"user@demo.always-on.app\"')]",
+
+                "environmentVariables": [
+                    {
+                        "name": "AZURE_DEVOPS_EXT_PAT",
+                        "value": "[parameters('adoPAT')]"
+                    }
+                ],
+                "azPowerShellVersion": "6.3",
+                "supportingScriptUris": [
+                    "https://raw.githubusercontent.com/hjscherer/AO/dev/aoArm/deploymentScript/AzDevOps-Functions.ps1"
+                ],
+                "timeout": "PT30M",
+                "cleanupPreference": "Always",
+                "retentionInterval": "P1D"
+            }
+        }
+    ],
+    "outputs": {}
+}

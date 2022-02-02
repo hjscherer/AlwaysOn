@@ -1,0 +1,677 @@
+{
+    "$schema": "<relative path to createFormUI.schema.json>",
+    "view": {
+        "kind": "Form",
+        "properties": {
+            "title": "AlwaysOn accelerator",
+            "steps": [
+                {
+                    "name": "deployment",
+                    "label": "Deployment",
+                    "elements": [
+                        {
+                            "name": "resourceScope",
+                            "type": "Microsoft.Common.ResourceScope"
+                        }
+                    ]
+                },
+                {
+                    "name": "aoDevOps",
+                    "label": "AlwaysOn DevOps",
+                    "subLabel": {},
+                    "bladeTitle": "AlwaysOn DevOps",
+                    "elements": [
+                        {
+                            "name": "info",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": true,
+                            "options": {
+                                "text": "AlwaysOn will be deployed and is full managed via a CICD pipeline using Azure DevOps Pipelines",
+                                "uri": "",
+                                "style": "Info"
+                            }
+                        },
+                        {
+                            "name": "Instructions",
+                            "type": "Microsoft.Common.TextBlock",
+                            "visible": true,
+                            "options": {
+                                "text": "Provide the credentials to initialize the repository with the ARM templates for AlwaysOn.",
+                                "link": {
+                                    "label": "Learn more",
+                                    "uri": ""
+                                }
+                            }
+                        },
+                        {
+                            "name": "aoPlOptions",
+                            "type": "Microsoft.Common.OptionsGroup",
+                            "label": "Select CICD option",
+                            "defaultValue": "Azure DevOps Pipelines",
+                            "toolTip": "AlwaysOn will provide options for Azure DevOps Pipelines. Additional options such as GitHub actions will be added in the future.",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "Azure DevOps Pipelines",
+                                        "value": "adoDevOpsPipelines"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "aoAdoOrg",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Select an existing Azure DevOps organization name",
+                            "toolTip": "Provide Azure DevOps organization name.",
+                            "visible": true,
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[a-z0-9A-Z-]{1,50}$",
+                                "validationMessage": "The Azure DevOps organization name must be 1-50 characters."
+                            }
+                        },
+                        {
+                            "name": "aoAdoProjectName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "New Azure DevOps project name",
+                            "toolTip": "Provide a name for the new repository that will be created",
+                            "defaultValue": "",
+                            "visible": true,
+                            "placeholder": "",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[a-z0-9A-Z-]{1,64}$",
+                                "validationMessage": "The repository name must be 1-64 characters."
+                            }
+                        },
+                        {
+                            "name": "aoADOPatToken",
+                            "type": "Microsoft.Common.PasswordBox",
+                            "label": {
+                                "password": "ADO personal access token",
+                                "confirmPassword": "Confirm PA Token"
+                            },
+                            "toolTip": "Provide the personal access token to access your ADO organization.",
+                            "constraints": {
+                                "required": true,
+                                "validationMessage": "Password must be at least 8 characters long, contain only numbers and letters"
+                            },
+                            "options": {
+                                "hideConfirmation": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "aoGhOrg",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "GitHub organization or username",
+                            "toolTip": "Provide an exiting GitHub org/username.",
+                            "visible": true,
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[a-z0-9A-Z-]{1,39}$",
+                                "validationMessage": "The GitHub org/username must be 1-39 characters."
+                            }
+                        },
+                        {
+                            "name": "aoPatToken",
+                            "type": "Microsoft.Common.PasswordBox",
+                            "label": {
+                                "password": "GitHub personal access token",
+                                "confirmPassword": "Confirm PA Token"
+                            },
+                            "toolTip": "Provide the personal access token to access your GitHub account or organization. For more information see this link: https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token",
+                            "constraints": {
+                                "required": true,
+                                "validationMessage": "Password must be at least 8 characters long, contain only numbers and letters"
+                            },
+                            "options": {
+                                "hideConfirmation": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "spnSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "",
+                            "elements": [
+                                {
+                                    "name": "aoServicePrincipal",
+                                    "type": "Microsoft.Common.ServicePrincipalSelector",
+                                    "visible": true,
+                                    "label": {
+                                        "password": "Password",
+                                        "certificateThumbprint": "Certificate thumbprint",
+                                        "authenticationType": "Authentication Type",
+                                        "sectionHeader": "Service Principal"
+                                    },
+                                    "toolTip": {
+                                        "password": "Provide the application secret as it will be used to authenticate with Azure AD",
+                                        "certificateThumbprint": "Certificate thumbprint",
+                                        "authenticationType": "Authentication Type"
+                                    },
+                                    "defaultValue": {
+                                        "principalId": "",
+                                        "name": ""
+                                    },
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "hideCertificate": true
+                                    }
+                                }
+                            ],
+                            "visible": true
+                        }
+                    ]
+                },
+                {
+                    "name": "aoE2ESettings",
+                    "label": "E2E environment",
+                    "bladeTitle": "E2E environment",
+                    "elements": [
+                        {
+                            "name": "info",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": true,
+                            "options": {
+                                "text": "AlwaysOn will use this prefix for all resource and resource groups as well in the pipeline configuration.",
+                                "uri": "",
+                                "style": "Info"
+                            }
+                        },
+                        {
+                            "name": "aoE2ESubSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Single platform subscription",
+                            "elements": [
+                                {
+                                    "type": "Microsoft.Common.SubscriptionSelector",
+                                    "name": "aoE2ESub",
+                                    "label": "AlwaysOn E2E subscription"
+                                }
+                            ],
+                            "visible": true
+                        },
+                        {
+                            "name": "resourceGroup",
+                            "type": "Microsoft.Common.TextBlock",
+                            "defaultValue": "",
+                            "visible": true,
+                            "options": {
+                                "text": "AlwaysOn deployment:",
+                                "link": {
+                                    "label": "Learn more",
+                                    "uri": ""
+                                }
+                            }
+                        },
+                        {
+                            "name": "aoE2EPrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "AlwaysOn E2E prefix",
+                            "toolTip": "Provide a prefix (max 5 characters)",
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[a-z0-9A-Z-]{1,5}$",
+                                "validationMessage": "The prefix must be 1-5 characters."
+                            },
+                            "visible": "true"
+                        },
+                        {
+                            "name": "aoE2ELocations",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "AlwaysOn deployment locations",
+                            "placeholder": "",
+                            "defaultValue": "Germany West Central",
+                            "toolTip": "",
+                            "multiselect": true,
+                            "selectAll": true,
+                            "filter": true,
+                            "filterPlaceholder": "Filter Azure regions...",
+                            "multiLine": false,
+                            "defaultDescription": "",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "North Europe",
+                                        "value": "northeurope"
+                                    },
+                                    {
+                                        "label": "West Europe",
+                                        "value": "westeurope"
+                                    },
+                                    {
+                                        "label": "Germany West Central",
+                                        "value": "germanywestcentral"
+                                    },
+                                    {
+                                        "label": "France Central",
+                                        "value": "francecentral"
+                                    },
+                                    {
+                                        "label": "UK South",
+                                        "value": "uksouth"
+                                    },
+                                    {
+                                        "label": "West US 2",
+                                        "value": "westus2"
+                                    },
+                                    {
+                                        "label": "East US",
+                                        "value": "eastus"
+                                    },
+                                    {
+                                        "label": "East US 2",
+                                        "value": "eastus2"
+                                    },
+                                    {
+                                        "label": "Centrak US",
+                                        "value": "centralus"
+                                    },
+                                    {
+                                        "label": "South Central US",
+                                        "value": "southcentralus"
+                                    },
+                                    {
+                                        "label": "Brazil South",
+                                        "value": "brazilsouth"
+                                    },
+                                    {
+                                        "label": "Canada Central",
+                                        "value": "canadacentral"
+                                    },
+                                    {
+                                        "label": "Australia East",
+                                        "value": "australiaeast"
+                                    },
+                                    {
+                                        "label": "South East Asia",
+                                        "value": "southeastasia"
+                                    },
+                                    {
+                                        "label": "Japan East",
+                                        "value": "japaneast"
+                                    }
+                                ],
+                                "required": "true"
+                            },
+                            "visible": "true"
+                        }
+                    ]
+                },
+                {
+                    "name": "aoINTSettings",
+                    "label": "INT environment",
+                    "bladeTitle": "INT environment",
+                    "elements": [
+                        {
+                            "name": "info",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": true,
+                            "options": {
+                                "text": "AlwaysOn will use this prefix for all resource and resource groups as well in the pipeline configuration.",
+                                "uri": "",
+                                "style": "Info"
+                            }
+                        },
+                        {
+                            "name": "aoIntEnabled",
+                            "type": "Microsoft.Common.OptionsGroup",
+                            "label": "Deploy a INT environment and pipeline?",
+                            "defaultValue": "Yes",
+                            "toolTip": "",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "Yes",
+                                        "value": "Yes"
+                                    },
+                                    {
+                                        "label": "No",
+                                        "value": "No"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "aoINTSubSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Single platform subscription",
+                            "elements": [
+                                {
+                                    "type": "Microsoft.Common.SubscriptionSelector",
+                                    "name": "aoIntSub",
+                                    "label": "AlwaysOn INT subscription"
+                                }
+                            ],
+                            "visible": "[equals(steps('aoINTSettings').aoIntEnabled, 'Yes')]"
+                        },
+                        {
+                            "name": "resourceGroup",
+                            "type": "Microsoft.Common.TextBlock",
+                            "defaultValue": "",
+                            "visible": "[equals(steps('aoINTSettings').aoIntEnabled, 'Yes')]",
+                            "options": {
+                                "text": "AlwaysOn deployment:",
+                                "link": {
+                                    "label": "Learn more",
+                                    "uri": ""
+                                }
+                            }
+                        },
+                        {
+                            "name": "aoIntPrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "AlwaysOn INT prefix",
+                            "toolTip": "Provide a prefix (max 5 characters)",
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": "[equals(steps('aoINTSettings').aoIntEnabled, 'Yes')]",
+                                "regex": "^[a-z0-9A-Z-]{1,5}$",
+                                "validationMessage": "The prefix must be 1-5 characters."
+                            },
+                            "visible": "[equals(steps('aoINTSettings').aoIntEnabled, 'Yes')]"
+                        },
+                        {
+                            "name": "aoIntLocations",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "AlwaysOn deployment locations",
+                            "placeholder": "",
+                            "defaultValue": "Germany West Central",
+                            "toolTip": "",
+                            "multiselect": true,
+                            "selectAll": true,
+                            "filter": true,
+                            "filterPlaceholder": "Filter Azure regions...",
+                            "multiLine": false,
+                            "defaultDescription": "",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "North Europe",
+                                        "value": "northeurope"
+                                    },
+                                    {
+                                        "label": "West Europe",
+                                        "value": "westeurope"
+                                    },
+                                    {
+                                        "label": "Germany West Central",
+                                        "value": "germanywestcentral"
+                                    },
+                                    {
+                                        "label": "France Central",
+                                        "value": "francecentral"
+                                    },
+                                    {
+                                        "label": "UK South",
+                                        "value": "uksouth"
+                                    },
+                                    {
+                                        "label": "West US 2",
+                                        "value": "westus2"
+                                    },
+                                    {
+                                        "label": "East US",
+                                        "value": "eastus"
+                                    },
+                                    {
+                                        "label": "East US 2",
+                                        "value": "eastus2"
+                                    },
+                                    {
+                                        "label": "Centrak US",
+                                        "value": "centralus"
+                                    },
+                                    {
+                                        "label": "South Central US",
+                                        "value": "southcentralus"
+                                    },
+                                    {
+                                        "label": "Brazil South",
+                                        "value": "brazilsouth"
+                                    },
+                                    {
+                                        "label": "Canada Central",
+                                        "value": "canadacentral"
+                                    },
+                                    {
+                                        "label": "Australia East",
+                                        "value": "australiaeast"
+                                    },
+                                    {
+                                        "label": "South East Asia",
+                                        "value": "southeastasia"
+                                    },
+                                    {
+                                        "label": "Japan East",
+                                        "value": "japaneast"
+                                    }
+                                ],
+                                "required": "[equals(steps('aoINTSettings').aoIntEnabled, 'Yes')]"
+                            },
+                            "visible": "[equals(steps('aoINTSettings').aoIntEnabled, 'Yes')]"
+                        }
+                    ]
+                },
+                {
+                    "name": "aoPRODSettings",
+                    "label": "PROD environment",
+                    "bladeTitle": "PROD environment",
+                    "elements": [
+                        {
+                            "name": "info",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": true,
+                            "options": {
+                                "text": "AlwaysOn will use this prefix for all resource and resource groups as well in the pipeline configuration.",
+                                "uri": "",
+                                "style": "Info"
+                            }
+                        },
+                        {
+                            "name": "aoProdEnabled",
+                            "type": "Microsoft.Common.OptionsGroup",
+                            "label": "Deploy a Prod environment and pipeline?",
+                            "defaultValue": "Yes",
+                            "toolTip": "",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "Yes",
+                                        "value": "Yes"
+                                    },
+                                    {
+                                        "label": "No",
+                                        "value": "No"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "aoPRODSubSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Single platform subscription",
+                            "elements": [
+                                {
+                                    "type": "Microsoft.Common.SubscriptionSelector",
+                                    "name": "aoSub",
+                                    "label": "AlwaysOn PROD subscription"
+                                }
+                            ],
+                            "visible": "[equals(steps('aoPRODSettings').aoProdEnabled, 'Yes')]"
+                        },
+                        {
+                            "name": "resourceGroup",
+                            "type": "Microsoft.Common.TextBlock",
+                            "defaultValue": "",
+                            "visible": "[equals(steps('aoPRODSettings').aoProdEnabled, 'Yes')]",
+                            "options": {
+                                "text": "AlwaysOn deployment:",
+                                "link": {
+                                    "label": "Learn more",
+                                    "uri": ""
+                                }
+                            }
+                        },
+                        {
+                            "name": "aoPRODPrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "AlwaysOn PROD prefix",
+                            "toolTip": "Provide a prefix (max 5 characters)",
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": "[equals(steps('aoPRODSettings').aoProdEnabled, 'Yes')]",
+                                "regex": "^[a-z0-9A-Z-]{1,5}$",
+                                "validationMessage": "The prefix must be 1-5 characters."
+                            },
+                            "visible": "[equals(steps('aoPRODSettings').aoProdEnabled, 'Yes')]"
+                        },
+                        {
+                            "name": "aoPRODLocations",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "AlwaysOn deployment locations",
+                            "placeholder": "",
+                            "defaultValue": "Germany West Central",
+                            "toolTip": "",
+                            "multiselect": true,
+                            "selectAll": true,
+                            "filter": true,
+                            "filterPlaceholder": "Filter Azure regions...",
+                            "multiLine": false,
+                            "defaultDescription": "",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "North Europe",
+                                        "value": "northeurope"
+                                    },
+                                    {
+                                        "label": "West Europe",
+                                        "value": "westeurope"
+                                    },
+                                    {
+                                        "label": "Germany West Central",
+                                        "value": "germanywestcentral"
+                                    },
+                                    {
+                                        "label": "France Central",
+                                        "value": "francecentral"
+                                    },
+                                    {
+                                        "label": "UK South",
+                                        "value": "uksouth"
+                                    },
+                                    {
+                                        "label": "West US 2",
+                                        "value": "westus2"
+                                    },
+                                    {
+                                        "label": "East US",
+                                        "value": "eastus"
+                                    },
+                                    {
+                                        "label": "East US 2",
+                                        "value": "eastus2"
+                                    },
+                                    {
+                                        "label": "Centrak US",
+                                        "value": "centralus"
+                                    },
+                                    {
+                                        "label": "South Central US",
+                                        "value": "southcentralus"
+                                    },
+                                    {
+                                        "label": "Brazil South",
+                                        "value": "brazilsouth"
+                                    },
+                                    {
+                                        "label": "Canada Central",
+                                        "value": "canadacentral"
+                                    },
+                                    {
+                                        "label": "Australia East",
+                                        "value": "australiaeast"
+                                    },
+                                    {
+                                        "label": "South East Asia",
+                                        "value": "southeastasia"
+                                    },
+                                    {
+                                        "label": "Japan East",
+                                        "value": "japaneast"
+                                    }
+                                ],
+                                "required": "[equals(steps('aoPRODSettings').aoProdEnabled, 'Yes')]"
+                            },
+                            "visible": "[equals(steps('aoPRODSettings').aoProdEnabled, 'Yes')]"
+                        }
+                    ]
+                },
+                {
+                    "name": "aoSolution",
+                    "label": "AlwaysOn Solution Industry Settings",
+                    "subLabel": {},
+                    "bladeTitle": "AlwaysOn Solution Industry Settings",
+                    "elements": [
+                        {
+                            "name": "resourceGroup",
+                            "type": "Microsoft.Common.TextBlock",
+                            "defaultValue": "",
+                            "visible": true,
+                            "options": {
+                                "text": "AlwaysOn for the game industry depends on the following additional Azure services. The pipeline will configure this services for initial use.",
+                                "link": {
+                                    "label": "Learn more",
+                                    "uri": "https://github.com/azure/alwayson"
+                                }
+                            }
+                        },
+                        {
+                            "name": "aoB2ctenantName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "AlwaysOn Azure AD B2C tenant name",
+                            "toolTip": "Provide a globaly unique tenant name. '.onmicrosoft.com' will be added when it is created.",
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[a-z0-9A-Z-]{1,50}$",
+                                "validationMessage": "Please provide a valid Azure AD tenant name."
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "outputs": {
+            "parameters": {
+                "principalId": "[steps('aoDevOps').spnSection.aoServicePrincipal.objectId]",
+                "appId": "[steps('aoDevOps').spnSection.aoServicePrincipal.appId]",
+                "principalSecret": "[steps('aoDevOps').spnSection.aoServicePrincipal.password]",
+                "adoOrgName": "[steps('aoDevOps').aoAdoOrg]",
+                "adoProjectName": "[steps('aoDevOps').aoAdoProjectName]",
+                "adoPAT": "[steps('aoDevOps').aoADOPatToken]",
+                "ghOrgName": "[steps('aoDevOps').aoGhOrg]",
+                "ghPAToken": "[steps('aoDevOps').aoPatToken]",
+                "e2ePrefix": "[steps('aoE2ESettings').aoE2EPrefix]",
+                "e2eSubscriptionId": "[steps('aoE2ESettings').aoE2ESubSection.aoE2ESub.subscription.id]",
+                "e2eLocations": "[steps('aoE2ESettings').aoE2ELocations]"
+            },
+            "kind": "Subscription",
+            "subscriptionId": "[steps('aoE2ESettings').aoE2ESubSection.aoE2ESub.subscription.id]",
+            "location": "[steps('deployment').resourceScope.location.name]"
+        }
+    }
+}
